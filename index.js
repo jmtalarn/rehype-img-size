@@ -20,7 +20,11 @@ function setImageSize(options) {
           dimensions = await probe(src);
         }
         if (dir && src.startsWith("data:image")) {
-          dimensions = sizeOf(Buffer.from(src.substr(23), "base64"));
+          dimensions = sizeOf(
+            Buffer.from(src.replace(/data:image\/.*;base64,/, ""), "base64")
+          );
+          dimensions.width = dimensions.width ?? dimensions.height ?? 640;
+          dimensions.height = dimensions.height ?? dimensions.width ?? 640;
         }
         if (dir && src.startsWith("/")) {
           src = path.join(dir, src);

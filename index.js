@@ -15,35 +15,20 @@ function setImageSize(options) {
     async function visitor(node) {
       if (node.tagName === "img") {
         let src = node.properties.src;
+        let dimensions;
         if (src.startsWith("http")) {
-          const { width, height } = await probe(src);
-          node.properties.width = width;
-          node.properties.height = height;
-          return;
+          dimensions = await probe(src);
         }
         if (dir && src.startsWith("data:image")) {
-          const { width, height } = await getImageDimensions(src);
-          node.properties.width = width;
-          node.properties.height = height;
-          return;
+          dimensions = sizeOf(Buffer.from(src.substr(23), "base64"));
         }
         if (dir && src.startsWith("/")) {
           src = path.join(dir, src);
+          dimensions = sizeOf(src);
         }
-        const dimensions = sizeOf(src);
         node.properties.width = dimensions.width;
         node.properties.height = dimensions.height;
       }
     }
   }
-}
-
-function getImageDimensions(file) {
-  return new Promise(function (resolved, rejected) {
-    var i = new Image();
-    i.onload = function () {
-      resolved({ width: i.width, height: i.height });
-    };
-    i.src = file;
-  });
 }

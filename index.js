@@ -10,9 +10,9 @@ function setImageSize(options) {
   const dir = opts.dir;
   return transformer;
 
-  async function transformer(tree, file) {
+  function transformer(tree, file) {
     visit(tree, "element", visitor);
-    function visitor(node) {
+    async function visitor(node) {
       if (node.tagName === "img") {
         let src = node.properties.src;
         if (src.startsWith("http")) {
